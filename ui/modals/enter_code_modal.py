@@ -8,7 +8,7 @@ from discord import ui
 
 from core.config import ConfigManager
 from core.loggers import log_tasks
-from ui.sync_support import get_verified_role, refresh_verify_panel
+from ui.sync_support import get_verified_role, refresh_verify_panel, reply_ephemeral
 
 
 def _parse_json_safe(text: str):
@@ -54,8 +54,32 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
+        # send_message (not defer) — defer+edit_original_response can update the public
+        # verify embed when the modal was opened from a message component.
+        if not await reply_ephemeral(
+            interaction, content="Checking your verification code..."
+        ):
+            return
+
         try:
+            existing = await asyncio.to_thread(_sync_get, interaction.user.id)
+            if existing.status_code == 200 and existing.text.strip():
+                try:
+                    existing_data = _parse_json_safe(existing.text)
+                    if existing_data.get("success"):
+                        username = existing_data.get("response", {}).get(
+                            "username", "unknown"
+                        )
+                        await interaction.edit_original_response(
+                            content=(
+                                f"You're already synced with **{username}**. "
+                                "Use **Unsync Account** first if you need to link a different account."
+                            )
+                        )
+                        return
+                except (json.JSONDecodeError, ValueError):
+                    pass
+
             try:
                 code = int(str(self.code.value).strip())
             except (TypeError, ValueError):
