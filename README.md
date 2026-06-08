@@ -2,8 +2,6 @@
 
 Discord bot for community utilities, polls, and server helpers on Minecadia.
 
-Music playback lives in **MinecadiaMusic** (`../MinecadiaMusic/`).
-
 ## What it does
 
 - Polls, tags, suggestions, and embed builder
