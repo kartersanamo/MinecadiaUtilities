@@ -1,0 +1,46 @@
+{
+    "TAGS": [
+        {
+            "NAME": "Discord Report",
+            "MESSAGE": "Hi there, thank you for taking the time and effort to make your report. Player and community safety is a top priority here at Minecadia. With that being said, specific standard operating procedures have been put in place to appropriately handle these discerning situations. For reports against players on Discord (not in-game) we require the reporter to provide the necessary information and evidence prior to further investigation. Please follow the steps listed below:\n \n**Have developer mode on**\n> - How to turn on Developer mode\n> - User Settings -> Advanced -> Developer Mode \n \n**Restart discord **\n> - Ctrl + Alt + Delete -> Task Manager -> Right Click Discord -> End Task -> Click Discord\n> - Go in the messages and show all proof\n \n**Get the user ID**\n> - Right Click User -> Copy ID -> Paste the ID in chat to show it in the video (dont need to send just show it)\n \n**Upload video (YouTube, Clipchamp, MedalTV, Streamable, etc)**\n> - Copy and paste video link to ticket."
+        },
+        {
+            "NAME": "Ticket Introduction Message",
+            "MESSAGE": "Hello! Thank you for making a support ticket. We have received your ticket and it is currently in process to be reviewed by an online staff member. We ask that you be patient as high ticket volume can cause varied response times."
+        },
+        {
+            "NAME": "Ticket Report Acceptance Message",
+            "MESSAGE": "Upon review and investigation, it has been determined that there is sufficient evidence to confirm that the reported player has been in violation of the server\u2019s rules. As a result, a punishment has been issued to the offending player in accordance with the Minecadia rules page. Thank you for your report in helping us keep the community safe."
+        },
+        {
+            "NAME": "Ticket Report Denied Message",
+            "MESSAGE": "After a thorough review and assessment, it has been determined that there is insufficient evidence at this present time to warrant a punishment on the reported player. We understand your frustration in the matter and thank you for taking the time in making said report. We strongly encourage the community to continuously report players who are in violation of server rules."
+        },
+        {
+            "NAME": "Ticket Report Denied, BUT with Screenshare Message",
+            "MESSAGE": "We have closely investigated the situation and reviewed all evidence presented to us. With that being said, it has been determined that there is insufficient evidence at this present time to warrant a punishment on the reported player. However, it has also been determined that there is enough evidence and suspicion to add the reported player to the Screenshare List where a member of our Screenshare Team will screenshare said player upon availability."
+        },
+        {
+            "NAME": "Appeal Acceptance Message",
+            "MESSAGE": "After further review on your ban, we have decided to give you the benefit of the doubt and unban you. Please note and be aware that a player who receives \u201cBenefit of the Doubt\u201d unban is not eligible to receive a revive as a result. You should be able to regain access to the server again. Please feel free to make another support ticket if further issues arise."
+        },
+        {
+            "NAME": "Appeal Deny Message",
+            "MESSAGE": "Upon reviewing your ban (evidence and anticheat logs included), it has been determined that the punishment is valid, therefore your appeal has been **denied**. You will need to either wait the remainder of the punishment out or use the Minecadia jail credit system to earn the unban. Jail credits may be obtained online by mining coal in the jail or may be purchased on our [store](https://store.minecadia.com/category/credits)."
+        },
+        {
+            "NAME": "Store Issue Tickets",
+            "MESSAGE": "Hello there, thank you for reaching out. We have received your ticket inquiry and a Sr. Admin or Manager will be able to further assist you in this matter. Please be aware that there are specified personnel who have access and resources to assist you. Due to the limited amount of people with this access, response times can and will vary at times. We will do our best to help you in a timely manner. In the meantime, please be sure that you have included all the information necessary to expedite the process."
+        }
+    ],
+    "PLAYER_TAGS": {
+        "837793755838939157": {
+            "sanamo": "Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud. Hello my name is sanamo and I am a fraud."
+        },
+        "200543436749668352": {
+            "Account Sharing": "Your account and who has access to your account is entirely your own responsibility. Account sharing is at your own risk and we will not recover items lost as a result of someone with access to your account taking them. \n\nPlayers are permitted to account share at their own discretion. However, the player who shared their account will be held liable for any punishment and or rule broken by the player who the account was shared with.\n\nIf you lose your account to account sharing or other means, there is nothing we can do to assist you in getting it back. That is the job of Microsoft support.\n\nWe recommend you 2fa your Microsoft account and do not share it to avoid possible losses.",
+            "IRL Trading": "IRL trading is not allowed on Minecadia. Choosing to break this rule and make illicit deals is entirely at your own risk and we will not assist you in recovering anything that may be lost.",
+            "Server IPs": "play.minecadia.net\nbhs.minecadia.net\nny.minecadia.com\neu.minecadia.com"
+        }
+    }
+}

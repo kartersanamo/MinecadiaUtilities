@@ -1,0 +1,542 @@
+{
+    "General": {
+        "TELEGRAM_POST_URL": "https://api.telegram.org/bot{token}/sendMessage",
+        "APPLICATION_PROCESS_MESSAGE": "Be sure to answer all questions to complete your application. Click the button below to proceed to the next step. If you close a question window, you can click the button again to return to your answers, as long as this message is still here.",
+        "APPLICATION_SUBMITTED_TITLE": "\u2705 Thank you for applying!",
+        "APPLICATION_SUBMITTED_MESSAGE": "Your **{self.role}** application has been submitted successfully! If you have not received any word from staff regarding your rank in 2 weeks, considered yourself denied, and you may reapply. If you have any questions or concerns, please don't hesitate to ask. Good luck & thank you for wanting to contribute to this server!",
+        "_comment": "TELEGRAM_BOT_TOKEN and GOOGLE_SHEETS_CREDENTIALS are in .env"
+    },
+    "Main_Embed": {
+        "title": "Minecadia Applications <:Minecadia:974713467703545907>",
+        "description": "We're always on the lookout for new team members at Minecadia! Interested in joining us as staff or giving feedback and testing early features? Apply below!\n\n**Status**\nStaff Team Application: {staff_status}\nQA Team Application: {qa_status}",
+        "image": "https://i.imgur.com/31RQtyd.png"
+    },
+    "Ranks": {
+        "qa": {
+            "spreadsheet_name": "Minecadia | QA Applications",
+            "telegram_chat_id": "-4554105503",
+            "emoji": "\ud83e\udebb",
+            "label": "QA Team",
+            "custom_id": "qa",
+            "status": "**OPEN**!",
+            "message": "This role is responsible for maintaing the integrity of Minecadia by testing bugs, providing feedback, and fostering a good experience for all players to come. QA members are held to a higher standard as they are the forefront of our playerbase. Think you'd be a good fit? Hit one of the buttons down below!\n \n**QA Team Qualifications:**\n- Must be active throughout the entire map.\n- Must be consistently engaged in discussion with other QA members, players, and staff- both in discord and in game.\n- Must provide suggestions to better our server.\n- Must keep a good attitude with all- toxicity will not be tolerated.",
+            "roles": {
+                "factions": {
+                    "label": "Factions QA",
+                    "emoji": "<a:tnt:1033280789116362773>",
+                    "custom_id": "factions",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "qa.factions.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your minecraft username",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s1.q2"
+                                },
+                                {
+                                    "label": "What faction are you a part of?",
+                                    "placeholder": "Please put your main faction",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Playtime Information",
+                            "custom_id": "qa.factions.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s2.q2"
+                                },
+                                {
+                                    "label": "What is your main role on Minecadia?",
+                                    "placeholder": "Expeditions, pvper, base player, voyages, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s2.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Content Questions",
+                            "custom_id": "qa.factions.s3",
+                            "questions": [
+                                {
+                                    "label": "What new features/ideas do you have?",
+                                    "placeholder": "New features/ideas...",
+                                    "length": "long",
+                                    "custom_id": "qa.factions.s3.q1"
+                                },
+                                {
+                                    "label": "How would you contribute to the QA team?",
+                                    "placeholder": "Please explain your answer in depth...",
+                                    "length": "long",
+                                    "custom_id": "qa.factions.s3.q2"
+                                },
+                                {
+                                    "label": "What is the biggest issue with the server?",
+                                    "placeholder": "Eco is too inflated, not enough content, etc.",
+                                    "length": "long",
+                                    "custom_id": "qa.factions.s3.q3"
+                                },
+                                {
+                                    "label": "Is there anything else that we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "short",
+                                    "custom_id": "qa.factions.s3.q4"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "kitmap": {
+                    "label": "Kitmap QA",
+                    "emoji": "\u2694\ufe0f",
+                    "custom_id": "kitmap",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "qa.kitmap.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your minecraft username",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s1.q2"
+                                },
+                                {
+                                    "label": "What faction are you a part of?",
+                                    "placeholder": "Please put your main faction",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Playtime Information",
+                            "custom_id": "qa.kitmap.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s2.q2"
+                                },
+                                {
+                                    "label": "What is your main role on Minecadia?",
+                                    "placeholder": "Expeditions, pvper, base player, voyages, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s2.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Content Questions",
+                            "custom_id": "qa.kitmap.s3",
+                            "questions": [
+                                {
+                                    "label": "What new features/ideas do you have?",
+                                    "placeholder": "New features/ideas...",
+                                    "length": "long",
+                                    "custom_id": "qa.kitmap.s3.q1"
+                                },
+                                {
+                                    "label": "How would you contribute to the QA team?",
+                                    "placeholder": "Please explain your answer in depth...",
+                                    "length": "long",
+                                    "custom_id": "qa.kitmap.s3.q2"
+                                },
+                                {
+                                    "label": "What is the biggest issue with the server?",
+                                    "placeholder": "Eco is too inflated, not enough content, etc.",
+                                    "length": "long",
+                                    "custom_id": "qa.kitmap.s3.q3"
+                                },
+                                {
+                                    "label": "Is there anything else that we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "short",
+                                    "custom_id": "qa.kitmap.s3.q4"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "lifesteal": {
+                    "label": "Lifesteal QA",
+                    "emoji": "\ud83d\udc99",
+                    "custom_id": "lifesteal",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "qa.lifesteal.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your minecraft username",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s1.q2"
+                                },
+                                {
+                                    "label": "What team are you a part of?",
+                                    "placeholder": "Please put your main team",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Playtime Information",
+                            "custom_id": "qa.lifesteal.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s2.q2"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Content Questions",
+                            "custom_id": "qa.lifesteal.s3",
+                            "questions": [
+                                {
+                                    "label": "What new features/ideas do you have?",
+                                    "placeholder": "New features/ideas...",
+                                    "length": "long",
+                                    "custom_id": "qa.lifesteal.s3.q1"
+                                },
+                                {
+                                    "label": "How would you contribute to the QA team?",
+                                    "placeholder": "Please explain your answer in depth...",
+                                    "length": "long",
+                                    "custom_id": "qa.lifesteal.s3.q2"
+                                },
+                                {
+                                    "label": "What is the biggest issue with the server?",
+                                    "placeholder": "Eco is too inflated, not enough content, etc.",
+                                    "length": "long",
+                                    "custom_id": "qa.lifesteal.s3.q3"
+                                },
+                                {
+                                    "label": "Is there anything else that we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "short",
+                                    "custom_id": "qa.lifesteal.s3.q4"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "staff": {
+            "spreadsheet_name": "Minecadia | Staff Applications",
+            "telegram_chat_id": "-4525888013",
+            "emoji": "\ud83d\udc6e",
+            "custom_id": "staff",
+            "label": "Staff Team",
+            "status": "**OPEN**!",
+            "message": "This role is responsible for maintaining tickets, moderating the chat, and, of course, helping the player base. Staff members are held to a higher standard as they represent the forefront of our community. Do you have the experience and believe you would be a great fit? Select the server you play on and would like to join as a Staff member!\n \n**Staff Team Qualifications:**\n- Must be active throughout the entire map.\n- Must be at least 13 years old.\n- Must have a solid understanding of our game modes.\n- Must maintain a positive attitude at all times, with zero tolerance for toxicity.\n- Must have notifications enabled for Telegram (this is where we will contact you if you are accepted.)\n\n**NOTE**: If you haven't been contacted through telegram within 2 weeks you can consider yourself denied.",
+            "roles": {
+                "factions": {
+                    "label": "Factions Staff",
+                    "emoji": "\ud83d\udea8",
+                    "custom_id": "factions",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "staff.factions.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your Minecraft username",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s1.q2"
+                                },
+                                {
+                                    "label": "What faction are you a part of?",
+                                    "placeholder": "Please put your main faction",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s1.q3"
+                                },
+                                {
+                                    "label": "How old are you?",
+                                    "placeholder": "You must be at least 13 years of age.",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Experience Information",
+                            "custom_id": "staff.factions.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.factions.s2.q2"
+                                },
+                                {
+                                    "label": "Do you have any previous staff experience?",
+                                    "placeholder": "If so, please list them all in detail.",
+                                    "length": "long",
+                                    "custom_id": "staff.factions.s2.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Other Questions",
+                            "custom_id": "staff.factions.s3",
+                            "questions": [
+                                {
+                                    "label": "What is your telegram username?",
+                                    "placeholder": "https://telegram.org/ This is how you will be contacted, make sure you have an @ and put it below.",
+                                    "length": "long",
+                                    "custom_id": "staff.factions.s3.q1"
+                                },
+                                {
+                                    "label": "Which staff members would vouch for you?",
+                                    "placeholder": "Please list any, if any, staff members that would vouch for you to be on the team.",
+                                    "length": "long",
+                                    "custom_id": "staff.factions.s3.q2"
+                                },
+                                {
+                                    "label": "Is there anything else we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "long",
+                                    "custom_id": "staff.factions.s3.q3"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "kitmap": {
+                    "label": "Kitmap Staff",
+                    "emoji": "\u2694\ufe0f",
+                    "custom_id": "kitmap",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "staff.kitmap.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your Minecraft username",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s1.q2"
+                                },
+                                {
+                                    "label": "What faction are you a part of?",
+                                    "placeholder": "Please put your main faction",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s1.q3"
+                                },
+                                {
+                                    "label": "How old are you?",
+                                    "placeholder": "You must be at least 13 years of age.",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Experience Information",
+                            "custom_id": "staff.kitmap.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.kitmap.s2.q2"
+                                },
+                                {
+                                    "label": "Do you have any previous staff experience?",
+                                    "placeholder": "If so, please list them all in detail.",
+                                    "length": "long",
+                                    "custom_id": "staff.kitmap.s2.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Other Questions",
+                            "custom_id": "staff.kitmap.s3",
+                            "questions": [
+                                {
+                                    "label": "What is your telegram username?",
+                                    "placeholder": "https://telegram.org/ This is how you will be contacted, make sure you have an @ and put it below.",
+                                    "length": "long",
+                                    "custom_id": "staff.kitmap.s3.q1"
+                                },
+                                {
+                                    "label": "Which staff members would vouch for you?",
+                                    "placeholder": "Please list any, if any, staff members that would vouch for you to be on the team.",
+                                    "length": "long",
+                                    "custom_id": "staff.kitmap.s3.q2"
+                                },
+                                {
+                                    "label": "Is there anything else we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "long",
+                                    "custom_id": "staff.kitmap.s3.q3"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "lifesteal": {
+                    "label": "Lifesteal Staff",
+                    "emoji": "\ud83c\udf4e",
+                    "custom_id": "lifesteal",
+                    "steps": [
+                        {
+                            "label": "General Information",
+                            "custom_id": "staff.lifesteal.s1",
+                            "questions": [
+                                {
+                                    "label": "What is your in game name?",
+                                    "placeholder": "Please enter your Minecraft username",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s1.q1"
+                                },
+                                {
+                                    "label": "What region are you from?",
+                                    "placeholder": "NA, EU, AU, SA, AF, AS, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s1.q2"
+                                },
+                                {
+                                    "label": "What team are you a part of?",
+                                    "placeholder": "Please put your main team",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s1.q3"
+                                },
+                                {
+                                    "label": "How old are you?",
+                                    "placeholder": "You must be at least 13 years of age.",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s1.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Experience Information",
+                            "custom_id": "staff.lifesteal.s2",
+                            "questions": [
+                                {
+                                    "label": "How many hrs/week do you spend on Minecadia?",
+                                    "placeholder": "Give us a rough estimate...",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s2.q1"
+                                },
+                                {
+                                    "label": "How long have you been playing Minecadia?",
+                                    "placeholder": "1 year, 6 months, 3 maps, etc.",
+                                    "length": "short",
+                                    "custom_id": "staff.lifesteal.s2.q2"
+                                },
+                                {
+                                    "label": "Do you have any previous staff experience?",
+                                    "placeholder": "If so, please list them all in detail.",
+                                    "length": "long",
+                                    "custom_id": "staff.lifesteal.s2.q3"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Other Questions",
+                            "custom_id": "staff.lifesteal.s3",
+                            "questions": [
+                                {
+                                    "label": "What is your telegram username?",
+                                    "placeholder": "https://telegram.org/ This is how you will be contacted, make sure you have an @ and put it below.",
+                                    "length": "long",
+                                    "custom_id": "staff.lifesteal.s3.q1"
+                                },
+                                {
+                                    "label": "Which staff members would vouch for you?",
+                                    "placeholder": "Please list any, if any, staff members that would vouch for you to be on the team.",
+                                    "length": "long",
+                                    "custom_id": "staff.lifesteal.s3.q2"
+                                },
+                                {
+                                    "label": "Is there anything else we should know?",
+                                    "placeholder": "Anything else?",
+                                    "length": "long",
+                                    "custom_id": "staff.lifesteal.s3.q3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

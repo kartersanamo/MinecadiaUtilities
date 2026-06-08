@@ -1,0 +1,169 @@
+{
+    "TRELLO_BOARDS": {
+        "Factions": "647e6a5c8b76f9afaf79dce8",
+        "Lifesteal": "647e6b5a0ff7fd9184b9349d",
+        "Kitmap": "647e6b5458555c38bc35e168",
+        "Anticheat": "647e6b414d4bd61388c4ccda",
+        "Cannon": "647e6b4765e0759618129ae2",
+        "Prisons": "647e6b5fd020bcbc85398a97"
+    },
+    "LOGO": "assets/Logo.png",
+    "FOOTER": "Minecadia Utility Bot",
+    "EMBED_COLOR": "0xF1C40F",
+    "PRESENCE": "play.minecadia.com",
+    "COGS_LIST": [
+        "screenshare",
+        "messagecounter",
+        "embed",
+        "sync",
+        "sendmessage",
+        "playercount",
+        "helper",
+        "suggestionlist",
+        "suggestionlock",
+        "logs",
+        "tags",
+        "poll",
+        "managepolls"
+    ],
+    "STAFF_ROLES": [
+        "*",
+        "Owner",
+        "Factions Management",
+        "Manager",
+        "Developer",
+        "Bot Developer",
+        "Sr. Administrator",
+        "Administrator",
+        "Staff of the Month",
+        "Jr. Administrator",
+        "Sr. Moderator",
+        "Moderator",
+        "Helper",
+        "Staff Team"
+    ],
+    "SR_MOD_ROLES": [
+        "*",
+        "Owner",
+        "Factions Management",
+        "Manager",
+        "Developer",
+        "Bot Developer",
+        "Sr. Administrator",
+        "Administrator",
+        "Jr. Administrator",
+        "Sr. Moderator"
+    ],
+    "ADMIN_ROLES": [
+        "*",
+        "Owner",
+        "Factions Management",
+        "Manager",
+        "Developer",
+        "Bot Developer",
+        "Sr. Administrator",
+        "Administrator"
+    ],
+    "TICKET_TYPES": [
+        "general",
+        "issue",
+        "applications",
+        "check",
+        "appeal",
+        "revive",
+        "bug",
+        "player",
+        "rollback",
+        "team",
+        "media"
+    ],
+    "TICKET_CATEGORIES": [
+        1224412450246627328,
+        948592775669121034,
+        1238913372435775550,
+        1003465142018768897,
+        1003465244787605626,
+        1185698620251574383,
+        1238913205196292198,
+        1010777747456524338,
+        1010744614153617439,
+        1009882045901721720,
+        1009574363915370620,
+        1009740448128045149,
+        1051128605083709500,
+        1051458276426006619,
+        1050239030379429889,
+        1051093261164494848,
+        1047710462176940032,
+        1051448015338078258,
+        1051525603188289727,
+        1051441545607389186,
+        1051564251657027585,
+        1051651998786801694,
+        1159193930856939620,
+        1222021514954539178,
+        1222021557967388723,
+        1222021595078590546,
+        1222021642587340840
+    ],
+    "ROLE_EMOJIS": {
+        "Events": "\ud83d\udea8",
+        "Sneak Peeks": "\ud83d\udcf8",
+        "Changelog": "\ud83d\udcdc",
+        "Giveaways": "\ud83c\udf81",
+        "Polls": "\ud83d\udcca",
+        "Factions": "\u2694\ufe0f",
+        "Lifesteal": "\ud83d\udc99",
+        "Kitmap": "\ud83c\udff9",
+        "Skyblock": "<:treeisland:1215311917917151293>",
+        "Games": "\ud83c\udfae",
+        "SMP": {
+            "emoji": "\ud83c\udf33",
+            "id": 1494724571407057026
+        }
+    },
+    "HELPER_CHANNELS": [
+        935016733033525328,
+        1032633836208672818,
+        918903892144717915,
+        1066045406028505178,
+        1012348851920834560
+    ],
+    "GIVEAWAY_BOT_ID": 294882584201003009,
+    "DISCORD_SUPPORT_CATEGORY_ID": 1185698620251574383,
+    "HELPER_RESPONSES": {
+        "ip": {
+            "Title": "play.minecadia.com",
+            "Description": "(Port 19132 - Bedrock Only)\n \n*Still unsure of how to join the server?*\nGo to <#922146090504032286> and then click the green **How to Play** button!"
+        },
+        "help": {
+            "Title": "Support",
+            "Description": "Looking for support? Check out the <#1003467703639613570> channel to receive support from our staff team!"
+        },
+        "twitter": {
+            "Title": "You can find the Minecadia Twitter at",
+            "Description": "## > https://twitter.com/PlayMinecadia \nGiveaways are often hosted here!"
+        },
+        "rules": {
+            "Title": "In game rules can be found at ",
+            "Description": "## > https://minecadia.com/rules/ \nDiscord Rules can be accessed by clicking on `Rules` in the <#922146090504032286> channel!"
+        },
+        "store": {
+            "Title": "Click here to visit the Minecadia Store!",
+            "Description": "## > https://store.minecadia.com/"
+        },
+        "vote": {
+            "Title": "You can vote for our server at",
+            "Description": "## > https://www.minecadia.com/vote/ \nFree in game rewards will be granted upon completion!"
+        },
+        "apply": {
+            "Title": "Applications",
+            "Description": "If you're interested in becoming a part of one of Minecadia's Teams, you can find all of our applications in \n<#918902487208050729>"
+        },
+        "wiki": {
+            "Title": "Minecadia Wiki",
+            "Description": "## > https://wiki.minecadia.com/ \nIf you're looking to learn more about Minecadia, then head over to the Minecadia Wiki to enhance your Minecadia knowledge!"
+        }
+    },
+    "_comment": "TOKEN, DATABASE_CONFIG, SYNC_AUTH, webhooks are in .env"
+}

@@ -1,0 +1,6 @@
+.env
+*.log
+*.py[cod]
+.venv/
+logs/
+assets/sheets_credentials.json
