@@ -1,10 +1,14 @@
-from discord import ui
-import json
-import requests
+import asyncio
 import datetime
+import json
+
 import discord
+import requests
+from discord import ui
+
 from core.config import ConfigManager
 from core.loggers import log_tasks
+from ui.sync_support import get_verified_role, refresh_verify_panel
 
 
 def _parse_json_safe(text: str):
@@ -21,70 +25,188 @@ def _parse_json_safe(text: str):
     return obj
 
 
-class EnterCode(ui.Modal):
-    def __init__(self) -> None:
-        super().__init__(title="Enter your verification code below", timeout=None, custom_id="enter_code_modal")
+def _sync_headers() -> dict[str, str]:
+    return {"X-Auth-Token": ConfigManager.get("SYNC_AUTH")}
 
-        self.add_item(ui.TextInput(label="What is the code that was provided to you?", style=discord.TextStyle.short))
+
+def _sync_put(user_id: int, code: int) -> requests.Response:
+    return requests.put(
+        f"https://api-public.minecadia.net/discord/{user_id}",
+        headers=_sync_headers(),
+        json={"sync_code": code},
+        timeout=15,
+    )
+
+
+def _sync_get(user_id: int) -> requests.Response:
+    return requests.get(
+        f"https://api-public.minecadia.net/discord/{user_id}",
+        headers=_sync_headers(),
+        timeout=15,
+    )
+
+
+class EnterCode(ui.Modal, title="Enter your verification code below"):
+    code = ui.TextInput(
+        label="What is the code that was provided to you?",
+        style=discord.TextStyle.short,
+        max_length=12,
+    )
+
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         try:
-            await interaction.response.send_message(content="Checking your verification code...", ephemeral=True)
-
             try:
-                code = int(self.children[0].value)
+                code = int(str(self.code.value).strip())
+            except (TypeError, ValueError):
+                log_tasks.warning(
+                    f"{interaction.user} ({interaction.user.id}) entered an invalid code "
+                    f"'{self.code.value}'"
+                )
+                await interaction.edit_original_response(
+                    content="Invalid verification code. Please try again."
+                )
+                return
 
-            except Exception:
-                log_tasks.warning(f"{interaction.user} ({interaction.user.id}) entered an invalid code '{self.children[0].value}'")
-                return await interaction.edit_original_response(content="Invalid verification code. Please try again.")
-
-            headers = {"X-Auth-Token": ConfigManager.get("SYNC_AUTH")}
-            response = requests.put(f"https://api-public.minecadia.net/discord/{interaction.user.id}", headers=headers, json={"sync_code": code})
+            response = await asyncio.to_thread(_sync_put, interaction.user.id, code)
 
             if response.status_code == 404:
-                log_tasks.warning(f"{interaction.user} ({interaction.user.id}) attempted to sync, but their account was not found (404).")
-                return await interaction.edit_original_response(content="Account not found. Please ensure you have registered before syncing.")
+                log_tasks.warning(
+                    f"{interaction.user} ({interaction.user.id}) attempted to sync, "
+                    "but their account was not found (404)."
+                )
+                await interaction.edit_original_response(
+                    content=(
+                        "Account not found. Please ensure you have registered before syncing."
+                    )
+                )
+                return
 
             try:
                 response_data = _parse_json_safe(response.text)
             except (requests.exceptions.JSONDecodeError, json.JSONDecodeError, ValueError) as e:
-                log_tasks.error(f"JSON decode error for {interaction.user.id} (sync submit): {e}")
-                return await interaction.edit_original_response(content="Received invalid data from sync service. Please try again later.")
+                log_tasks.error(
+                    f"JSON decode error for {interaction.user.id} (sync submit): {e}"
+                )
+                await interaction.edit_original_response(
+                    content="Received invalid data from sync service. Please try again later."
+                )
+                return
 
-            if response_data.get('success'):
-                role = discord.utils.get(interaction.guild.roles, name="Verified")
-                await interaction.user.add_roles(role)
-                await interaction.edit_original_response(content="You have successfully completed the verification process and **synced** your account.")
+            if not response_data.get("success"):
+                log_tasks.error(
+                    f"Could not verify {interaction.user} ({interaction.user.id}) "
+                    f"due to an invalid response from API {response_data}"
+                )
+                await interaction.edit_original_response(
+                    content="Invalid verification code. Please try again."
+                )
+                return
 
-                response = requests.get(f"https://api-public.minecadia.net/discord/{interaction.user.id}", headers=headers)
+            guild = interaction.guild
+            if guild is None:
+                await interaction.edit_original_response(
+                    content="This command can only be used in a server."
+                )
+                return
 
-                if response.status_code == 404:
-                    log_tasks.warning(f"{interaction.user} ({interaction.user.id}) attempted to fetch synced data, but their account was not found (404).")
-                    return await interaction.edit_original_response(content="Account not found after syncing. Please contact support.")
+            verified_role = get_verified_role(guild)
+            if verified_role is None:
+                await interaction.edit_original_response(
+                    content="Verified role is not configured. Please contact staff."
+                )
+                return
 
+            member = guild.get_member(interaction.user.id)
+            if member is None:
                 try:
-                    response_data = _parse_json_safe(response.text)
-                except (requests.exceptions.JSONDecodeError, json.JSONDecodeError, ValueError) as e:
-                    log_tasks.error(f"JSON decode error for {interaction.user.id} (sync fetch): {e}")
-                    return await interaction.edit_original_response(content="Received invalid data from sync service. Please try again later.")
-                username: str = response_data['response']['username']
-                description = f"{interaction.user.mention} ({interaction.user.id}) has **SYNCED** their account with the following IGN: **{username}**"
-                embed = discord.Embed(title="Sync Account Log", description=description, color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")), timestamp=datetime.datetime.utcnow())
-                logs_channel = interaction.guild.get_channel(918928087582916699)
+                    member = await guild.fetch_member(interaction.user.id)
+                except discord.HTTPException:
+                    member = None
+            if member is None:
+                await interaction.edit_original_response(
+                    content="Could not resolve your server membership. Try again."
+                )
+                return
+
+            await member.add_roles(verified_role, reason="Minecadia account sync")
+            await interaction.edit_original_response(
+                content=(
+                    "You have successfully completed the verification process and "
+                    "**synced** your account."
+                )
+            )
+
+            profile_response = await asyncio.to_thread(_sync_get, interaction.user.id)
+            if profile_response.status_code == 404:
+                log_tasks.warning(
+                    f"{interaction.user} ({interaction.user.id}) attempted to fetch synced "
+                    "data, but their account was not found (404)."
+                )
+                await interaction.edit_original_response(
+                    content=(
+                        "Account synced, but profile lookup failed. Please contact support "
+                        "if your nickname did not update."
+                    )
+                )
+                return
+
+            try:
+                profile_data = _parse_json_safe(profile_response.text)
+            except (requests.exceptions.JSONDecodeError, json.JSONDecodeError, ValueError) as e:
+                log_tasks.error(
+                    f"JSON decode error for {interaction.user.id} (sync fetch): {e}"
+                )
+                return
+
+            username = profile_data.get("response", {}).get("username")
+            if not username:
+                return
+
+            logs_channel_id = int(ConfigManager.get("SYNC_LOGS_CHANNEL_ID") or 0)
+            logs_channel = guild.get_channel(logs_channel_id)
+            if isinstance(logs_channel, discord.TextChannel):
+                description = (
+                    f"{interaction.user.mention} ({interaction.user.id}) has **SYNCED** "
+                    f"their account with the following IGN: **{username}**"
+                )
+                embed = discord.Embed(
+                    title="Sync Account Log",
+                    description=description,
+                    color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
+                    timestamp=datetime.datetime.now(datetime.timezone.utc),
+                )
                 await logs_channel.send(embed=embed)
 
-                try:
-                    await interaction.user.edit(nick=username)
+            try:
+                await member.edit(nick=str(username)[:32], reason="Minecadia account sync")
+            except discord.Forbidden:
+                log_tasks.warning(
+                    f"Could not change {interaction.user} ({interaction.user.id})'s nickname "
+                    "due to missing permissions."
+                )
+                await interaction.edit_original_response(
+                    content=(
+                        "You have successfully completed the verification process and "
+                        "**synced** your account.\n"
+                        "`Note: I could not change your nickname due to missing permissions.`"
+                    )
+                )
 
-                except Exception:
-                    log_tasks.warning(f"Could not change {interaction.user} ({interaction.user.id})'s nickname due to missing permissions.")
-                    await interaction.edit_original_response(content="You have successfully completed the verification process and **synced** your account.\n`ERROR: I could not change your nickname due to missing permissions.`")
-
-                log_tasks.info(f"Successfully synced {interaction.user} ({interaction.user.id}) with the IGN of '{username}'")
-
-            else:
-                log_tasks.error(f"Could not verify {interaction.user} ({interaction.user.id}) due to an invalid response from API {response_data}")
-                return await interaction.edit_original_response(content="Invalid verification code. Please try again.")
+            log_tasks.info(
+                f"Successfully synced {interaction.user} ({interaction.user.id}) "
+                f"with the IGN of '{username}'"
+            )
 
         except Exception as e:
-            log_tasks.error(f"Could not verify {interaction.user} ({interaction.user.id}) due to {e}")
-            await interaction.edit_original_response(content=f"Failed! I could not verify your account. \n```{e}```")
+            log_tasks.error(
+                f"Could not verify {interaction.user} ({interaction.user.id}) due to {e}"
+            )
+            try:
+                await interaction.edit_original_response(
+                    content="Failed! I could not verify your account. Please try again later."
+                )
+            except discord.HTTPException:
+                pass
+        finally:
+            await refresh_verify_panel(interaction)

@@ -1,9 +1,12 @@
-import json
-import requests
 import datetime
+import json
+
 import discord
+import requests
+
 from core.config import ConfigManager
 from core.loggers import log_tasks
+from ui.sync_support import get_verified_role
 
 
 def _parse_json_safe(text: str):
@@ -52,42 +55,89 @@ class ConfirmButtons(discord.ui.View):
                 return await interaction.edit_original_response(content="Received invalid data from sync service. Please try again later.")
 
             if response_data.get('success'):
-                role = discord.utils.get(interaction.guild.roles, name="Verified")
-                await user.remove_roles(role)
+                role = get_verified_role(interaction.guild)
+                if role and role in user.roles:
+                    await user.remove_roles(role)
                 await user.edit(nick=None)
-                await self.old_interaction.edit_original_response(embed=None, content="Successfully **unsynced** your account.", view=None)
-                logs_channel = interaction.guild.get_channel(918928087582916699)
+                await self.old_interaction.edit_original_response(
+                    embed=None,
+                    content="Successfully **unsynced** your account.",
+                    view=None,
+                )
+                logs_channel_id = int(ConfigManager.get("SYNC_LOGS_CHANNEL_ID") or 0)
+                logs_channel = interaction.guild.get_channel(logs_channel_id)
                 old_username: str = oldresponse_data['response']['username']
-                embed = discord.Embed(title="Unsync Account Log", color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")), timestamp=datetime.datetime.utcnow(), description=f"{user.mention} ({user.id}) has **UNSYNCED** their account from the following IGN: **{old_username}**")
-                await logs_channel.send(embed=embed)
+                embed = discord.Embed(
+                    title="Unsync Account Log",
+                    color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
+                    timestamp=datetime.datetime.now(datetime.timezone.utc),
+                    description=(
+                        f"{user.mention} ({user.id}) has **UNSYNCED** their account "
+                        f"from the following IGN: **{old_username}**"
+                    ),
+                )
+                if isinstance(logs_channel, discord.TextChannel):
+                    await logs_channel.send(embed=embed)
                 log_tasks.info(f"Successfully unsynced {interaction.user} ({interaction.user.id}) from the IGN of '{old_username}'")
 
             else:
-                log_tasks.error(f"Could not unsync {interaction.user} ({interaction.user.id}) due to an invalid response from API {response_data}")
-                await interaction.edit_original_response(content=f"Failed! I could not unsync your account. ")
+                log_tasks.error(
+                    f"Could not unsync {interaction.user} ({interaction.user.id}) due to an "
+                    f"invalid response from API {response_data}"
+                )
+                await interaction.edit_original_response(
+                    content="Failed! I could not unsync your account."
+                )
 
         except Exception as e:
-            log_tasks.error(f"Could not unsync {interaction.user} ({interaction.user.id}) due to {e}")
-            await interaction.edit_original_response(content=f"Failed! I could not unsync your account. \n```{e}```")
+            log_tasks.error(
+                f"Could not unsync {interaction.user} ({interaction.user.id}) due to {e}"
+            )
+            await interaction.edit_original_response(
+                content="Failed! I could not unsync your account. Please try again later."
+            )
 
     @discord.ui.button(emoji="👍", style=discord.ButtonStyle.grey, custom_id="ConfirmYes")
     async def confirm_yes(self, interaction: discord.Interaction, Button: discord.ui.Button):
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             await self.perform_unsync(interaction)
-            log_tasks.info(f"{interaction.user} ({interaction.user.id}) clicked the '{Button.emoji}' button")
-        
+            log_tasks.info(
+                f"{interaction.user} ({interaction.user.id}) clicked the '{Button.emoji}' button"
+            )
+
         except Exception as e:
-            await interaction.edit_original_response(content = f"'{Button.emoji}' button error {e}")
-            log_tasks.error(f"{interaction.user} ({interaction.user.id}) failed to click the '{Button.emoji}' button {e}")
+            await interaction.edit_original_response(
+                content="Something went wrong while unsyncing. Please try again."
+            )
+            log_tasks.error(
+                f"{interaction.user} ({interaction.user.id}) failed to click the "
+                f"'{Button.emoji}' button {e}"
+            )
 
     @discord.ui.button(emoji="👎", style=discord.ButtonStyle.grey, custom_id="ConfirmNo")
     async def confirm_no(self, interaction: discord.Interaction, Button: discord.ui.Button):
         try:
-            await interaction.response.defer()
-            await self.old_interaction.edit_original_response(embed=None, content="Successfully cancelled unsyncing your account.", view=None)
-            log_tasks.info(f"{interaction.user} ({interaction.user.id}) clicked the '{Button.emoji}' button")
-        
+            await interaction.response.defer(ephemeral=True)
+            await self.old_interaction.edit_original_response(
+                embed=None,
+                content="Successfully cancelled unsyncing your account.",
+                view=None,
+            )
+            await interaction.edit_original_response(
+                content="Unsync cancelled.",
+                embed=None,
+                view=None,
+            )
+            log_tasks.info(
+                f"{interaction.user} ({interaction.user.id}) clicked the '{Button.emoji}' button"
+            )
+
         except Exception as e:
-            await interaction.edit_original_response(content = f"'{Button.emoji}' button error {e}")
-            log_tasks.error(f"{interaction.user} ({interaction.user.id}) failed to click the '{Button.emoji}' button {e}")
+            await interaction.edit_original_response(
+                content="Something went wrong. Please try again."
+            )
+            log_tasks.error(
+                f"{interaction.user} ({interaction.user.id}) failed to click the "
+                f"'{Button.emoji}' button {e}"
+            )

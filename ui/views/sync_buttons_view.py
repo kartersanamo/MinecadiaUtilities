@@ -50,6 +50,9 @@ async def _send_ephemeral(
     return await interaction.response.send_message(**kwargs)
 
 
+from ui.sync_support import get_verified_role
+
+
 class SyncButtons(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -71,9 +74,13 @@ class SyncButtons(discord.ui.View):
 
             # Check HTTP status
             if original_response.status_code == 404:
-                log_tasks.info(f"Sending the 'EnterCode' modal to {interaction.user} ({interaction.user.id})")
+                log_tasks.info(
+                    f"Sending the 'EnterCode' modal to {interaction.user} ({interaction.user.id})"
+                )
                 await interaction.response.send_modal(EnterCode())
-                log_tasks.info(f"{interaction.user} ({interaction.user.id}) clicked the '{Button.label}' button")
+                log_tasks.info(
+                    f"{interaction.user} ({interaction.user.id}) clicked the '{Button.label}' button"
+                )
                 return
 
             if original_response.status_code != 200:
@@ -157,7 +164,7 @@ class SyncButtons(discord.ui.View):
             )
 
             if original_response.status_code == 404:
-                role = interaction.guild.get_role(1016520282682445914)
+                role = get_verified_role(interaction.guild)
                 if role and role in interaction.user.roles:
                     await interaction.user.remove_roles(role)
                 await _send_ephemeral(interaction, content="You are not currently synced.")
@@ -200,7 +207,7 @@ class SyncButtons(discord.ui.View):
 
                 await _send_ephemeral(interaction, embed=embed, view=buttons)
             else:
-                role = interaction.guild.get_role(1016520282682445914)
+                role = get_verified_role(interaction.guild)
                 if role and role in interaction.user.roles:
                     await interaction.user.remove_roles(role)
                 await _send_ephemeral(interaction, content="You are not currently synced.")
