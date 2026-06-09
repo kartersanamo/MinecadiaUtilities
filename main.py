@@ -61,23 +61,9 @@ class Client(commands.Bot):
 
     @task("Sync Command Tree")
     async def sync_command_tree(self) -> list[discord.app_commands.AppCommand]:
-        app_id = self.application_id
-        guild_id = os.getenv("DISCORD_GUILD_ID", "").strip()
-        if guild_id.isdigit() and app_id:
-            gid = int(guild_id)
-            guild = discord.Object(id=gid)
-            self.tree.clear_commands(guild=guild)
-            self.tree.copy_global_to(guild=guild)
-            guild_cmds = await self.tree.sync(guild=guild)
-            log_tasks.info(
-                "Guild-synced %s commands to guild %s",
-                len(guild_cmds),
-                guild_id,
-            )
-        synced = await self.tree.sync()
-        command_list = ", ".join(c.name for c in synced)
-        log_tasks.info("Globally synced %s commands: %s", len(synced), command_list)
-        return synced
+        from core.guild_command_sync import sync_guild_commands
+
+        return await sync_guild_commands(self, log=log_tasks)
 
     @task("Setup Hook")
     async def setup_hook(self):
