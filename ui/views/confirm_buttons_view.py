@@ -64,20 +64,21 @@ class ConfirmButtons(discord.ui.View):
                     content="Successfully **unsynced** your account.",
                     view=None,
                 )
-                logs_channel_id = int(ConfigManager.get("SYNC_LOGS_CHANNEL_ID") or 0)
-                logs_channel = interaction.guild.get_channel(logs_channel_id)
                 old_username: str = oldresponse_data['response']['username']
-                embed = discord.Embed(
-                    title="Unsync Account Log",
-                    color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
-                    timestamp=datetime.datetime.now(datetime.timezone.utc),
-                    description=(
-                        f"{user.mention} ({user.id}) has **UNSYNCED** their account "
-                        f"from the following IGN: **{old_username}**"
+                from core.logging.http_client import post_audit_log
+
+                await post_audit_log(
+                    event_type="account.unsync",
+                    title="Account Unsynced",
+                    summary=(
+                        f"{user.mention} ({user.id}) unsynced "
+                        f"from IGN **{old_username}**"
                     ),
+                    actor_id=user.id,
+                    guild_id=interaction.guild.id if interaction.guild else None,
+                    source_bot="Utilities",
+                    metadata={"ign": old_username},
                 )
-                if isinstance(logs_channel, discord.TextChannel):
-                    await logs_channel.send(embed=embed)
                 log_tasks.info(f"Successfully unsynced {interaction.user} ({interaction.user.id}) from the IGN of '{old_username}'")
 
             else:

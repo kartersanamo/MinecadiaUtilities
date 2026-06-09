@@ -187,20 +187,20 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
             if not username:
                 return
 
-            logs_channel_id = int(ConfigManager.get("SYNC_LOGS_CHANNEL_ID") or 0)
-            logs_channel = guild.get_channel(logs_channel_id)
-            if isinstance(logs_channel, discord.TextChannel):
-                description = (
-                    f"{interaction.user.mention} ({interaction.user.id}) has **SYNCED** "
-                    f"their account with the following IGN: **{username}**"
-                )
-                embed = discord.Embed(
-                    title="Sync Account Log",
-                    description=description,
-                    color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
-                    timestamp=datetime.datetime.now(datetime.timezone.utc),
-                )
-                await logs_channel.send(embed=embed)
+            from core.logging.http_client import post_audit_log
+
+            await post_audit_log(
+                event_type="account.sync",
+                title="Account Synced",
+                summary=(
+                    f"{interaction.user.mention} ({interaction.user.id}) synced "
+                    f"their account with IGN **{username}**"
+                ),
+                actor_id=interaction.user.id,
+                guild_id=guild.id,
+                source_bot="Utilities",
+                metadata={"ign": username},
+            )
 
             try:
                 await member.edit(nick=str(username)[:32], reason="Minecadia account sync")
