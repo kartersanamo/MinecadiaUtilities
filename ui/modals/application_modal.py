@@ -39,11 +39,7 @@ class ApplicationModal(discord.ui.Modal):
     
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        if interaction.user.id not in self.answers.keys():
-            self.answers[interaction.user.id] = {}
-        self.answers[interaction.user.id].update({
-            field.label: field.value for field in self.children
-        })
+        _collect_modal_answers(self, self.answers, interaction.user.id)
         # Is not the final step yet
         if self.step < self.total_steps:
             from ui.views.step_buttons_modal import StepButtons
@@ -72,6 +68,8 @@ class ApplicationModal(discord.ui.Modal):
             telegram_bot_token: str = os.getenv('TELEGRAM_BOT_TOKEN') or ConfigManager.load('applications')['General'].get('TELEGRAM_BOT_TOKEN', '')
 
             try:
+                if not credentials:
+                    raise ValueError("GOOGLE_SHEETS_CREDENTIALS is not configured")
                 service_account = gspread.service_account(filename=credentials)
                 spreadsheet = service_account.open(spreadsheet_name)
                 wkst = spreadsheet.worksheet(ConfigManager.load('applications')['Ranks'][self.rank]['roles'][self.role.lower()]['label'])
@@ -79,7 +77,15 @@ class ApplicationModal(discord.ui.Modal):
                 body.extend(list(self.answers[interaction.user.id].values()))
                 wkst.append_row(body, table_range = "D4:O4")
             except Exception as e:
-                print(f"Error updating Google Sheet: {e}")
+                err = str(e)
+                if "invalid_grant" in err or "Invalid JWT Signature" in err:
+                    log_tasks.error(
+                        "Google Sheets auth failed: the service account key in "
+                        "GOOGLE_SHEETS_CREDENTIALS is invalid or revoked. Regenerate the "
+                        "JSON key in Google Cloud Console and replace the credentials file."
+                    )
+                else:
+                    log_tasks.error(f"Error updating Google Sheet: {e}")
 
             # Send telegram notification to the correct group chat
             try:
@@ -138,9 +144,8 @@ class ApplicationModal(discord.ui.Modal):
     def add_fields(self):
         for field in self.step_data['questions']:
             question = discord.ui.TextInput(
-                label = field['label'],
                 placeholder = field['label'],
                 style = discord.TextStyle.long if field['length'] == 'long' else discord.TextStyle.short,
                 max_length = 1024
             )
-            self.add_item(question)
+            self.add_item(discord.ui.Label(text=field['label'], component=question))
