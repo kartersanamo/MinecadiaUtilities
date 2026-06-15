@@ -7,6 +7,35 @@ from core.config import ConfigManager
 from ui.views.applications_view import Applications
 from ui.views.information_view import InformationView
 
+
+def build_sync_embed() -> discord.Embed:
+    embed = discord.Embed(
+        title="Account Verification",
+        color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
+        description=(
+            "In order to receive support from our staff team, you will need to verify yourself first. "
+            "This is a quick process — do not be worried.\n"
+            "\n"
+            "**Steps**\n"
+            "> **1)** Connect to **`play.minecadia.com`**\n"
+            "> **2)** Type **`/sync`** in one of our lobbies\n"
+            "> **3)** Copy the code, return to Discord, and click the green **Sync Account** button\n"
+            "> **4)** Enter your sync code in the pop-up, press submit, and you're done!\n"
+            "\n"
+            "*Wish to unlink your account? Press the red **Unsync Account** button.*"
+        ),
+    )
+    embed.add_field(
+        name="Can't join play.minecadia.com?",
+        value=(
+            "Connect to **`sync.minecadia.com`** instead, type **`/sync`** in chat to receive your code, "
+            "then come back here and click **Sync Account** below."
+        ),
+        inline=False,
+    )
+    return embed
+
+
 class SendMessage(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -19,18 +48,7 @@ class SendMessage(commands.Cog):
         await interaction.response.send_message(content="Sending your message...", ephemeral=True)
         embeds = {
               "Sync": [
-                {"embed": discord.Embed(color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")), 
-                                        description=("**Verify Yourself**\n"
-                                                     "\n"
-                                                      "In order to receive support from our staff team, you will need to verify yourself first. This is a quick process, do not be worried.\n"
-                                                      "\n"
-                                                      "**Steps**\n"
-                                                      "> **1)** Connect to `play.minecadia.com`\n"
-                                                      "> **2)** Type \"/sync\" in one of our lobbies\n"
-                                                      "> **3)** Copy the code, go back to discord & click the green \"Sync Account\" button\n"
-                                                      "> **4)** Type your sync code into the pop up box, press submit and you\'re done!\n"
-                                                      "\n"
-                                                      "*Wish to unlink your account? Press the red \"Unsync Account\" button.*")),
+                {"embed": build_sync_embed(),
                   "view": SyncButtons(),
                   "image": "https://i.imgur.com/rxRI82O.png"
                 }

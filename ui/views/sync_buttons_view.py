@@ -7,7 +7,7 @@ from core.config import ConfigManager
 from core.loggers import log_tasks
 from ui.modals.enter_code_modal import EnterCode
 from ui.views.confirm_buttons_view import ConfirmButtons
-from ui.sync_support import get_verified_role, reply_ephemeral
+from ui.sync_support import get_verified_role, refresh_verify_panel, reply_ephemeral
 
 
 def _parse_json_safe(text: str):
@@ -57,8 +57,6 @@ class SyncButtons(discord.ui.View):
                 )
                 return
 
-            # Discord requires a response within 3 seconds — open the modal immediately.
-            # Sync status / already-synced checks run in the modal submit handler.
             await interaction.response.send_modal(EnterCode())
             log_tasks.info(
                 f"{interaction.user} ({interaction.user.id}) clicked the '{Button.label}' button"
@@ -95,36 +93,28 @@ class SyncButtons(discord.ui.View):
                 )
                 return
 
-            await interaction.response.defer(ephemeral=True)
+            if not await reply_ephemeral(interaction, content="Checking sync status..."):
+                return
 
             original_response = await asyncio.to_thread(
                 _fetch_discord_sync, interaction.user.id, self.headers
             )
 
-            if original_response.status_code == 404:
-                role = get_verified_role(interaction.guild)
-                if role and role in interaction.user.roles:
-                    await interaction.user.remove_roles(role)
-                await reply_ephemeral(interaction, content="You are not currently synced.")
-                log_tasks.info(
-                    f"{interaction.user} ({interaction.user.id}) clicked the '{Button.label}' button"
-                )
-                return
-
             if original_response.status_code != 200:
                 log_tasks.error(
                     f"API returned status {original_response.status_code} for {interaction.user.id}"
                 )
-                await reply_ephemeral(
-                    interaction,
-                    content="Unable to check sync status. Please try again later.",
-                )
+                role = get_verified_role(interaction.guild)
+                if role and role in interaction.user.roles:
+                    await interaction.user.remove_roles(role)
+                    await interaction.edit_original_response(content = "Unsynced your account by removing your `@Verified` role.")
+                else:
+                    await interaction.edit_original_response(content = "You are not synced.")
                 return
 
             if not original_response.text or original_response.text.strip() == "":
                 log_tasks.error(f"Empty response from API for {interaction.user.id}")
-                await reply_ephemeral(
-                    interaction,
+                await interaction.edit_original_response(
                     content="Received invalid response from sync service. Please try again later.",
                 )
                 return
@@ -133,8 +123,7 @@ class SyncButtons(discord.ui.View):
                 response = _parse_json_safe(original_response.text)
             except (requests.exceptions.JSONDecodeError, json.JSONDecodeError, ValueError) as json_err:
                 log_tasks.error(f"JSON decode error for {interaction.user.id}: {json_err}")
-                await reply_ephemeral(
-                    interaction,
+                await interaction.edit_original_response(
                     content="Received invalid data from sync service. Please try again later.",
                 )
                 return
@@ -148,52 +137,74 @@ class SyncButtons(discord.ui.View):
                 embed.set_footer(text=ConfigManager.get("FOOTER"), icon_url=logo_url)
 
                 buttons = ConfirmButtons()
-                buttons.old_interaction = interaction
+                buttons.panel_interaction = interaction
 
-                await reply_ephemeral(interaction, embed=embed, view=buttons)
+                await interaction.edit_original_response(embed=embed, view=buttons)
             else:
                 role = get_verified_role(interaction.guild)
                 if role and role in interaction.user.roles:
                     await interaction.user.remove_roles(role)
-                await reply_ephemeral(interaction, content="You are not currently synced.")
+                await interaction.edit_original_response(content="You are not currently synced.")
 
             log_tasks.info(
                 f"{interaction.user} ({interaction.user.id}) clicked the '{Button.label}' button"
             )
 
         except requests.exceptions.Timeout:
-            await reply_ephemeral(
-                interaction,
-                content="The sync service is taking too long to respond. Please try again later.",
-            )
+            if interaction.response.is_done():
+                await interaction.edit_original_response(
+                    content="The sync service is taking too long to respond. Please try again later.",
+                )
+            else:
+                await reply_ephemeral(
+                    interaction,
+                    content="The sync service is taking too long to respond. Please try again later.",
+                )
             log_tasks.error(
                 f"Timeout when checking sync status for {interaction.user} ({interaction.user.id})"
             )
 
         except requests.exceptions.RequestException as req_err:
-            await reply_ephemeral(
-                interaction,
-                content="Unable to connect to sync service. Please try again later.",
-            )
+            if interaction.response.is_done():
+                await interaction.edit_original_response(
+                    content="Unable to connect to sync service. Please try again later.",
+                )
+            else:
+                await reply_ephemeral(
+                    interaction,
+                    content="Unable to connect to sync service. Please try again later.",
+                )
             log_tasks.error(
                 f"Request error for {interaction.user} ({interaction.user.id}): {req_err}"
             )
 
         except discord.Forbidden:
-            await reply_ephemeral(
-                interaction,
-                content="I don't have permission to manage your roles.",
-            )
+            if interaction.response.is_done():
+                await interaction.edit_original_response(
+                    content="I don't have permission to manage your roles.",
+                )
+            else:
+                await reply_ephemeral(
+                    interaction,
+                    content="I don't have permission to manage your roles.",
+                )
             log_tasks.error(
                 f"Missing permissions to remove role from {interaction.user} ({interaction.user.id})"
             )
 
         except Exception as e:
-            await reply_ephemeral(
-                interaction,
-                content="An unexpected error occurred. Please try again later.",
-            )
+            if interaction.response.is_done():
+                await interaction.edit_original_response(
+                    content="An unexpected error occurred. Please try again later.",
+                )
+            else:
+                await reply_ephemeral(
+                    interaction,
+                    content="An unexpected error occurred. Please try again later.",
+                )
             log_tasks.error(
                 f"{interaction.user} ({interaction.user.id}) failed to click the "
                 f"'{Button.label}' button: {e}"
             )
+        finally:
+            await refresh_verify_panel(interaction)

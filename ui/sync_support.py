@@ -20,6 +20,8 @@ async def refresh_verify_panel(interaction: discord.Interaction) -> None:
     message = interaction.message
     if message is None or message.author.id != interaction.client.user.id:
         return
+    if message.flags.ephemeral:
+        return
     try:
         edit_kwargs: dict = {"view": SyncButtons(), "content": None}
         if message.embeds:

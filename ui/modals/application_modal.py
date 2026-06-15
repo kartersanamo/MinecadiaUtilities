@@ -5,6 +5,17 @@ import discord
 import gspread
 import os
 from core.config import ConfigManager
+from core.loggers import log_tasks
+
+
+def _collect_modal_answers(modal: discord.ui.Modal, answers: dict, user_id: int) -> None:
+    if user_id not in answers:
+        answers[user_id] = {}
+    for child in modal.children:
+        if isinstance(child, discord.ui.Label):
+            answers[user_id][child.text] = child.component.value
+        elif isinstance(child, discord.ui.TextInput):
+            answers[user_id][child.custom_id] = child.value
 
 
 class ApplicationModal(discord.ui.Modal):

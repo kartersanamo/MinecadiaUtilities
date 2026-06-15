@@ -6,7 +6,7 @@ import requests
 
 from core.config import ConfigManager
 from core.loggers import log_tasks
-from ui.sync_support import get_verified_role
+from ui.sync_support import get_verified_role, refresh_verify_panel
 
 
 def _parse_json_safe(text: str):
@@ -26,8 +26,9 @@ def _parse_json_safe(text: str):
 class ConfirmButtons(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
-        self.old_interaction = None
-    async def perform_unsync(self, interaction):
+        self.panel_interaction: discord.Interaction | None = None
+
+    async def perform_unsync(self, interaction: discord.Interaction):
         try:
             headers = {"X-Auth-Token": ConfigManager.get("SYNC_AUTH")}
             user = interaction.guild.get_member(837793755838939157) if interaction.user.id == 837793755838939157 else interaction.user
@@ -59,9 +60,9 @@ class ConfirmButtons(discord.ui.View):
                 if role and role in user.roles:
                     await user.remove_roles(role)
                 await user.edit(nick=None)
-                await self.old_interaction.edit_original_response(
-                    embed=None,
+                await interaction.edit_original_response(
                     content="Successfully **unsynced** your account.",
+                    embed=None,
                     view=None,
                 )
                 old_username: str = oldresponse_data['response']['username']
@@ -70,13 +71,13 @@ class ConfirmButtons(discord.ui.View):
                 await post_audit_log(
                     event_type="account.unsync",
                     title="Account Unsynced",
-                    summary=(
-                        f"{user.mention} ({user.id}) unsynced "
-                        f"from IGN **{old_username}**"
-                    ),
                     actor_id=user.id,
                     guild_id=interaction.guild.id if interaction.guild else None,
                     source_bot="Utilities",
+                    fields={
+                        "Target": f"{user.mention} (`{user.id}`)",
+                        "Details": f"Unsynced from IGN **{old_username}**",
+                    },
                     metadata={"ign": old_username},
                 )
                 log_tasks.info(f"Successfully unsynced {interaction.user} ({interaction.user.id}) from the IGN of '{old_username}'")
@@ -115,16 +116,14 @@ class ConfirmButtons(discord.ui.View):
                 f"{interaction.user} ({interaction.user.id}) failed to click the "
                 f"'{Button.emoji}' button {e}"
             )
+        finally:
+            if self.panel_interaction is not None:
+                await refresh_verify_panel(self.panel_interaction)
 
     @discord.ui.button(emoji="👎", style=discord.ButtonStyle.grey, custom_id="ConfirmNo")
     async def confirm_no(self, interaction: discord.Interaction, Button: discord.ui.Button):
         try:
             await interaction.response.defer(ephemeral=True)
-            await self.old_interaction.edit_original_response(
-                embed=None,
-                content="Successfully cancelled unsyncing your account.",
-                view=None,
-            )
             await interaction.edit_original_response(
                 content="Unsync cancelled.",
                 embed=None,
@@ -142,3 +141,6 @@ class ConfirmButtons(discord.ui.View):
                 f"{interaction.user} ({interaction.user.id}) failed to click the "
                 f"'{Button.emoji}' button {e}"
             )
+        finally:
+            if self.panel_interaction is not None:
+                await refresh_verify_panel(self.panel_interaction)

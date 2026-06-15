@@ -54,7 +54,7 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        # send_message (not defer) — defer+edit_original_response can update the public
+        # send_message (not defer) - defer+edit_original_response can update the public
         # verify embed when the modal was opened from a message component.
         if not await reply_ephemeral(
             interaction, content="Checking your verification code..."
@@ -101,7 +101,7 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
                 )
                 await interaction.edit_original_response(
                     content=(
-                        "Account not found. Please ensure you have registered before syncing."
+                        "Invalid verification code. Please try again."
                     )
                 )
                 return
@@ -192,13 +192,13 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
             await post_audit_log(
                 event_type="account.sync",
                 title="Account Synced",
-                summary=(
-                    f"{interaction.user.mention} ({interaction.user.id}) synced "
-                    f"their account with IGN **{username}**"
-                ),
                 actor_id=interaction.user.id,
                 guild_id=guild.id,
                 source_bot="Utilities",
+                fields={
+                    "Target": f"{interaction.user.mention} (`{interaction.user.id}`)",
+                    "Details": f"Synced account with IGN **{username}**",
+                },
                 metadata={"ign": username},
             )
 
