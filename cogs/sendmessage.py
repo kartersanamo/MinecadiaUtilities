@@ -14,7 +14,7 @@ def build_sync_embed() -> discord.Embed:
         color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")),
         description=(
             "In order to receive support from our staff team, you will need to verify yourself first. "
-            "This is a quick process — do not be worried.\n"
+            "This is a quick process - do not be worried.\n"
             "\n"
             "**Steps**\n"
             "> **1)** Connect to **`play.minecadia.com`**\n"
@@ -28,8 +28,8 @@ def build_sync_embed() -> discord.Embed:
     embed.add_field(
         name="Can't join play.minecadia.com?",
         value=(
-            "Connect to **`sync.minecadia.com`** instead, type **`/sync`** in chat to receive your code, "
-            "then come back here and click **Sync Account** below."
+            "Connect to **`sync.minecadia.com`** instead, and you will get a code on the server screen, "
+            "then come back here and click **Sync Account** below and enter the code."
         ),
         inline=False,
     )
