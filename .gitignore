@@ -4,3 +4,7 @@
 .venv/
 logs/
 assets/sheets_credentials.json
+
+# Auto-generated diagrams (regenerate: python3 ../scripts/generate_bot_diagrams.py MinecadiaUtilities)
+docs/diagrams/*
+!docs/diagrams/.gitkeep
