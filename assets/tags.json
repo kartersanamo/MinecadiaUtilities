@@ -40,7 +40,8 @@
         "200543436749668352": {
             "Account Sharing": "Your account and who has access to your account is entirely your own responsibility. Account sharing is at your own risk and we will not recover items lost as a result of someone with access to your account taking them. \n\nPlayers are permitted to account share at their own discretion. However, the player who shared their account will be held liable for any punishment and or rule broken by the player who the account was shared with.\n\nIf you lose your account to account sharing or other means, there is nothing we can do to assist you in getting it back. That is the job of Microsoft support.\n\nWe recommend you 2fa your Microsoft account and do not share it to avoid possible losses.",
             "IRL Trading": "IRL trading is not allowed on Minecadia. Choosing to break this rule and make illicit deals is entirely at your own risk and we will not assist you in recovering anything that may be lost.",
-            "Server IPs": "play.minecadia.net\nbhs.minecadia.net\nny.minecadia.com\neu.minecadia.com"
+            "Server IPs": "play.minecadia.net\nbhs.minecadia.net\nny.minecadia.com\neu.minecadia.com",
+            "New IPs": "vin.minecadia.com\ntcp.minecadia.com\nplay.minecadia.com\neu.minecadia.com\niad.minecadia.com"
         }
     }
 }
