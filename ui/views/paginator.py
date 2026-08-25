@@ -12,8 +12,10 @@ class Paginator(discord.ui.View):
         self.current_page = 1
         self.category: discord.Category = None
         self.count: bool = False
+        self.client: discord.Client | None = None
 
     async def send(self, interaction: discord.Interaction):
+        self.client = interaction.client
         try:
             await interaction.response.send_message(view=self, content="")
         except Exception:
@@ -21,7 +23,6 @@ class Paginator(discord.ui.View):
         await self.update_message(interaction)
 
     def create_embed(self):
-        settings = ConfigManager.all()
         embed = discord.Embed(title=self.title, description="", color=discord.Color.gold())
         footer_text = self.get_footer_text()
         if self.data[0] == "No data found.":
@@ -35,9 +36,11 @@ class Paginator(discord.ui.View):
             else:
                 for item in self.get_current_page_data():
                     embed.description += f"{item}\n"
-        if footer_text:
-            logo_url = interaction.client.app.embeds.get_logo_url(ConfigManager.get("LOGO"))
+        if footer_text and self.client is not None:
+            logo_url = self.client.app.embeds.get_logo_url(ConfigManager.get("LOGO"))
             embed.set_footer(icon_url=logo_url, text=footer_text)
+        elif footer_text:
+            embed.set_footer(text=footer_text)
         return embed
 
     async def update_message(self, interaction: discord.Interaction):
