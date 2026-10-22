@@ -141,7 +141,10 @@ class EnterCode(ui.Modal, title="Enter your verification code below"):
                 )
                 return
 
-            member = guild.get_member(interaction.user.id)
+            try:
+                member = await guild.fetch_member(interaction.user.id)
+            except (discord.NotFound, discord.HTTPException):
+                member = None
             if member is None:
                 try:
                     member = await guild.fetch_member(interaction.user.id)

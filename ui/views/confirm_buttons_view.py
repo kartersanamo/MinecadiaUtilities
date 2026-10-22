@@ -31,7 +31,12 @@ class ConfirmButtons(discord.ui.View):
     async def perform_unsync(self, interaction: discord.Interaction):
         try:
             headers = {"X-Auth-Token": ConfigManager.get("SYNC_AUTH")}
-            user = interaction.guild.get_member(837793755838939157) if interaction.user.id == 837793755838939157 else interaction.user
+            user = interaction.user
+            if interaction.user.id == 837793755838939157:
+                try:
+                    user = await interaction.guild.fetch_member(837793755838939157)
+                except discord.HTTPException:
+                    pass
             oldresponse = requests.get(f"https://api-public.minecadia.net/discord/{user.id}", headers=headers)
 
             if oldresponse.status_code == 404:

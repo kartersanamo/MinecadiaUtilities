@@ -6,6 +6,17 @@ import discord
 from core.config import ConfigManager
 from core.database import execute
 from ui.views.poll_buttons_view import PollButtons
+COLOR_TO_STYLE = {"Grey": discord.ButtonStyle.secondary, "Blue": discord.ButtonStyle.primary,
+                  "Green": discord.ButtonStyle.success, "Red": discord.ButtonStyle.danger}
+
+class PollDescriptionModal(discord.ui.Modal, title="Poll description"):
+  description = discord.ui.TextInput(label="Description", style=discord.TextStyle.paragraph, max_length=4000)
+  def __init__(self, callback):
+    super().__init__()
+    self.callback = callback
+  async def on_submit(self, interaction):
+    await self.callback(interaction, str(self.description))
+
 class Poll(commands.Cog):
   def __init__(self, client: commands.Bot):
     self.client = client
@@ -20,20 +31,20 @@ class Poll(commands.Cog):
                  option5_text:str=None, option5color:Literal['Grey', 'Blue', 'Green', 'Red']=None):
     if interaction.guild is None:
             return await interaction.response.send_message(content="Commands cannot be ran in DMs!", ephemeral=True)
-    def check(m):
-      return m.author == interaction.user and m.channel == interaction.channel
-      
-    await interaction.response.send_message(content="Creating your poll... Please follow the instructions", ephemeral=True)
+    await interaction.response.send_modal(PollDescriptionModal(
+      lambda modal_interaction, description: self._finish_poll(
+        modal_interaction, title, channel, option1_text, option1color, option2_text, option2color,
+        option3_text, option3color, option4_text, option4color, option5_text, option5color, description
+      )
+    ))
 
-    embed = discord.Embed(color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")), description="Send the content of your poll description. Discord markdown is supported.")
-
-    requesting_description = await interaction.channel.send(embed=embed)
-    poll_description = await interaction.client.wait_for("message", check=check)
+  async def _finish_poll(self, interaction, title, channel, option1_text, option1color, option2_text, option2color,
+                         option3_text, option3color, option4_text, option4color, option5_text, option5color, description):
     option3_text = option3_text if option3_text else ""
     option4_text = option4_text if option4_text else ""
     option5_text = option5_text if option5_text else ""
 
-    embed = discord.Embed(title=f"{title}", description=poll_description.content, color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")))
+    embed = discord.Embed(title=f"{title}", description=description, color=discord.Color.from_str(ConfigManager.get("EMBED_COLOR")))
     logo_url = self.client.app.embeds.get_logo_url(ConfigManager.get("LOGO"))
     embed.set_footer(text=ConfigManager.get("FOOTER"), icon_url=logo_url)
 
@@ -70,10 +81,7 @@ class Poll(commands.Cog):
         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, '', '', '', '', '', %s)",
         (poll.id, title, channel.id, option1_text, option2_text, option3_text, option4_text, option5_text, _ts),
     )
-    await poll_description.delete()
-    await requesting_description.delete()
-      
-    await interaction.edit_original_response(content=f"Poll Sent! {channel.mention}")
+    await interaction.response.send_message(content=f"Poll Sent! {channel.mention}", ephemeral=True)
 
 
 

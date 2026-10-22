@@ -12,15 +12,18 @@ class RemoveMember(discord.ui.Select):
     self.option = option
     self.old_votes = old_votes
     self.which_vote = which_vote
-    self.member_votes = [discord.utils.get(interaction.guild.members, id=int(vote)) for vote in self.old_votes.split("___") if vote]
-    options = [discord.SelectOption(label=member_obj.display_name) for member_obj in list(set(self.member_votes))]
+    self.member_votes = [int(vote) for vote in self.old_votes.split("___") if vote]
+    options = [discord.SelectOption(label=f"Member {member_id}", value=str(member_id)) for member_id in dict.fromkeys(self.member_votes)]
     super().__init__(placeholder=f"Select a member to remove their vote...", options=options)
 
     with open("assets/config.json", "r") as file:
         self.data = json.load(file)
 
   async def callback(self, interaction: discord.Interaction):
-    member_object = discord.utils.get(interaction.guild.members, name=self.values[0])
+    try:
+        member_object = await interaction.guild.fetch_member(int(self.values[0]))
+    except (ValueError, discord.NotFound, discord.HTTPException):
+        return await interaction.response.send_message("Member is no longer in the server.", ephemeral=True)
     new_votes = self.old_votes.replace("___"+str(member_object.id), "", 1)
     await execute(
         f"UPDATE polls SET `option{self.which_vote}_votes` = %s WHERE `title` = %s",

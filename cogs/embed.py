@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import app_commands
 import discord
 import json
 from core.config import ConfigManager
@@ -13,16 +14,16 @@ class Embed(commands.Cog):
         with open("assets/config.json", "r") as file:
             self.data = json.load(file)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @app_commands.command(name="announcement", description="Create an announcement embed")
+    @app_commands.describe(content="Announcement text; put each option on its own line")
+    async def announcement(self, interaction: discord.Interaction, content: str):
         try:
-            if not await is_staff(message.author, message.guild):
+            if not await is_staff(interaction.user, interaction.guild):
                 return
         except Exception:
             return
 
         try:
-            content = message.content
             split = content.split("\n")
             footer = False
             author = False
@@ -76,14 +77,14 @@ class Embed(commands.Cog):
                 embed.title = title
 
             if footer:
-                embed.timestamp = message.created_at
-                embed.set_footer(text=message.author, icon_url=message.author.avatar)
+                embed.timestamp = discord.utils.utcnow()
+                embed.set_footer(text=str(interaction.user), icon_url=interaction.user.display_avatar.url)
 
             if color:
                 embed.color = discord.Color.from_str(color)
 
             if author:
-                embed.set_author(name=message.author, icon_url=message.author.avatar)
+                embed.set_author(name=str(interaction.user), icon_url=interaction.user.display_avatar.url)
 
             if image:
                 try:
@@ -99,15 +100,15 @@ class Embed(commands.Cog):
         
             if replace:
                 mg, chn = replace.split("/")
-                channel = message.guild.get_channel(int(chn))
+                channel = interaction.guild.get_channel(int(chn))
                 msg = await channel.fetch_message(int(mg))
                 await msg.edit(embed=embed)
+                await interaction.response.send_message("Announcement updated.", ephemeral=True)
         
             else:
-                await message.channel.send(embed=embed)
-                log_tasks.info(f"Embed formatter sent by {message.author} ({message.author.id}) in #{message.channel} ({message.channel.id})")
-
-            await message.delete()
+                await interaction.channel.send(embed=embed)
+                log_tasks.info(f"Embed formatter sent by {interaction.user} ({interaction.user.id}) in #{interaction.channel} ({interaction.channel.id})")
+                await interaction.response.send_message("Announcement sent.", ephemeral=True)
         
         except Exception as e:
             log_tasks.error(f"Error sending embed formatter {e}")

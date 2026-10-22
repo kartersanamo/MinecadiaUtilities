@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import app_commands
 import discord
 import typing
 from core.config import ConfigManager
@@ -14,12 +15,12 @@ class Helper(commands.Cog):
         bucket = self._cd.get_bucket(message)
         return bucket.update_rate_limit()
   
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author.bot or await is_staff(message.author, message.guild) or message.channel.id not in ConfigManager.get('HELPER_CHANNELS'):
+    @app_commands.command(name="helper", description="Get help for a keyword")
+    async def helper(self, interaction: discord.Interaction, keyword: str):
+        if await is_staff(interaction.user, interaction.guild) or interaction.channel_id not in ConfigManager.get('HELPER_CHANNELS'):
             return
         try:
-            msg = message.content.lower()
+            msg = keyword.lower()
             words = msg.split(" ")
             title = None
             description = None
@@ -29,16 +30,14 @@ class Helper(commands.Cog):
                     description = response['Description']
                     break
             if description:
-                ratelimit = self.get_ratelimit(message)
-                if ratelimit:
-                    log_tasks.info(f"Cannot send helper message {title} as {message.author} ({message.author.id}) in {message.channel} ({message.channel.id}) is on cooldown")
-                    return
                 embed = discord.Embed(title=title, description=description, color=discord.Color.from_str(ConfigManager.get('EMBED_COLOR')))
                 logo_url = self.client.app.embeds.get_logo_url(ConfigManager.get('LOGO'))
                 embed.set_thumbnail(url=logo_url)
                 embed.set_footer(text=ConfigManager.get('FOOTER'), icon_url=logo_url)
-                await message.reply(embed=embed, file=discord.File("assets/Logo.png"))
-                log_tasks.info(f"Helper message {title} replied to {message.author} ({message.author.id}) in {message.channel} ({message.channel.id})")
+                await interaction.response.send_message(embed=embed, file=discord.File("assets/Logo.png"))
+                log_tasks.info(f"Helper message {title} sent to {interaction.user} ({interaction.user.id}) in channel {interaction.channel_id}")
+            else:
+                await interaction.response.send_message("No helper response matched that keyword.", ephemeral=True)
 
         except Exception as e:
             log_tasks.error(f"Error sending helper message {e}")

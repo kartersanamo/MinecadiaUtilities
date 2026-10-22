@@ -26,24 +26,6 @@ class MessageCounter(commands.Cog):
     async def on_message(self, message):
         try:
             if message.author.bot:
-                if message.author.id == ConfigManager.get('GIVEAWAY_BOT_ID') and "Congratulations" in message.content:
-                    ids: list[int] = [int(match) for match in re.findall(r'<@(\d+)>', message.content)]
-                    prize: str = message.content.split('won the ')[1]
-                    category = self.client.get_channel(ConfigManager.get('DISCORD_SUPPORT_CATEGORY_ID'))
-                    for id in ids:
-                        user = message.guild.get_member(id)
-                        channel = await message.guild.create_text_channel(category = category, name = "giveaway-winner", overwrites = category.overwrites)
-                        await channel.set_permissions(user, view_channel = True, send_messages = True)
-                        number = await self.get_number()
-                        await execute(
-                            "INSERT INTO `tickets` (`channel_id`, `owner_id`, `type`, `opened_at`, `number`, `is_active`, `closed_by_id`, `closed_at`, `reason`, `name`, `transcript`, `privated`) "
-                            "VALUES (%s, %s, %s, %s, %s, %s, NULL, NULL, NULL, NULL, NULL, %s)",
-                            (channel.id, user.id, "Giveaway Rewards", int(time.time()), number, 1, "Admin"),
-                        )
-                        embed = discord.Embed(color = discord.Color.from_str(ConfigManager.get('EMBED_COLOR')),
-                                            description = f"Hey {user.mention}!\n \nYou have created a new ticket!\n**Type:** Giveaway Rewards ({prize})\n \nThis ticket has been automatically created for you by a staff member. Please provide any information they require.\n \n**One of our staff members will be with you shortly.**")
-                        await channel.send(content = user.mention)
-                        await channel.send(embed = embed)
                 return
             if not await is_staff(message.author, message.guild):
                 return
@@ -57,19 +39,19 @@ class MessageCounter(commands.Cog):
             )
             await execute(
                 "UPDATE staff_statistics SET `characters_sent` = %s WHERE `user_id` = %s",
-                (characters_sent + len(message.content), message.author.id),
+                (characters_sent, message.author.id),
             )
             if analytics:
                 analytics.increment_total_stat(str(message.author.id), "messages_sent", 1)
                 analytics.increment_total_stat(
                     str(message.author.id),
                     "characters_sent",
-                    len(message.content or ""),
+                    0,
                 )
                 analytics.record_staff_message(
                     message.author.id,
                     message.channel.id,
-                    len(message.content or ""),
+                    0,
                 )
             # log_tasks.info(f"Message sent by {message.author} ({message.author.id}) in #{message.channel} ({message.channel.id}) {message_count+1} Messages {characters_sent+len(message.content)} Characters")
         

@@ -163,7 +163,10 @@ class Record(commands.Cog):
             return await interaction.response.send_message(
                 "Use this in a server.", ephemeral=True
             )
-        member = interaction.guild.get_member(interaction.user.id)
+        try:
+            member = await interaction.guild.fetch_member(interaction.user.id)
+        except (discord.NotFound, discord.HTTPException):
+            member = None
         if not member or not member.voice or not member.voice.channel:
             return await interaction.response.send_message(
                 "Join a voice channel first.", ephemeral=True

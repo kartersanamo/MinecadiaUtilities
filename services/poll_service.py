@@ -26,7 +26,7 @@ class PollService:
         if names:
             for vote in votes:
                 if vote.isdigit():
-                    member = discord.utils.get(interaction.guild.members, id=int(vote))
+                    member = await interaction.guild.fetch_member(int(vote))
                     if member:
                         value += f"\n {member.mention} ({member.name})"
         return {"name": poll_information[f"option{option}_text"], "value": value}

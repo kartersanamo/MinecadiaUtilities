@@ -42,7 +42,7 @@ class Screenshare(commands.Cog):
         if user.id in self.screenshares:
             information = self.screenshares[user.id]
 
-            screensharer = discord.utils.get(interaction.guild.members, id=int(information['screensharer']))
+            screensharer = await interaction.guild.fetch_member(int(information['screensharer']))
             started_at = await self.client.app.time_format.seconds_to_format(int(float(datetime.datetime.utcnow().timestamp())) - information['started_at'])
             channel = discord.utils.get(interaction.guild.voice_channels, id=int(information['channel_id']))
 
@@ -110,7 +110,7 @@ class Screenshare(commands.Cog):
 
         ss_information = self.screenshares[user.id]
         proof = "N/A" if not proof else proof
-        screensharer = discord.utils.get(interaction.guild.members, id=int(ss_information['screensharer']))
+        screensharer = await interaction.guild.fetch_member(int(ss_information['screensharer']))
         channel = discord.utils.get(interaction.guild.voice_channels, id=int(ss_information['channel_id']))
 
         await channel.delete(reason="Screenshare complete")
